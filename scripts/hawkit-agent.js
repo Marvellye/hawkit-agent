@@ -1,6 +1,3 @@
-require('dotenv').config();
-const axios = require('axios');
-const FormData = require('form-data');
 const fs = require('fs');
 const path = require('path');
 
@@ -11,33 +8,113 @@ const TOKEN_FILE = path.join(__dirname, '.auth_token');
 const LOOP_INTERVAL_MS = 60000; // 1 minute interval between checks
 const FILE_POLL_INTERVAL_MS = 5000; // 5 seconds polling for screenshot file
 
-// Environment Variables
-const {
-    USERNAME,
-    PASSWORD,
-    CLIENT_ID,
-    CLIENT_HASH,
-    SOCIAL_USERNAME
-} = process.env;
+// Load Environment Variables (Native Node.js support)
+try {
+    process.loadEnvFile();
+} catch (e) {
+    // If .env file is missing, we assume variables are already in environment
+}
 
-if (!USERNAME || !PASSWORD || !CLIENT_ID || !CLIENT_HASH || !SOCIAL_USERNAME) {
-    console.error("Missing required environment variables in .env");
+// Configuration Helpers
+function getArg(flag, alias) {
+    const idx = process.argv.findIndex(arg => arg === flag || (alias && arg === alias));
+    return (idx !== -1 && process.argv[idx + 1]) ? process.argv[idx + 1] : null;
+}
+
+const USERNAME = getArg('--user', '-u') || process.env.USERNAME;
+const PASSWORD = getArg('--pass', '-p') || process.env.PASSWORD;
+const SOCIAL_USERNAME = getArg('--social', '-s') || process.env.SOCIAL_USERNAME;
+const CLIENT_ID = getArg('--id') || process.env.CLIENT_ID || '1a26257c5fb5e4c7edc048035704ca0a';
+const CLIENT_HASH = getArg('--hash') || process.env.CLIENT_HASH || '1a26257c5fb5e4c7edc048035704ca0a';
+
+if (!USERNAME || !PASSWORD || !SOCIAL_USERNAME) {
+    console.error("Error: Missing required configuration.");
+    console.log("\nUsage: node scripts/hawkit-agent.js --user <user> --pass <pass> --social <social_handle>");
+    console.log("Alternatively, provide USERNAME, PASSWORD, and SOCIAL_USERNAME in a .env file.");
     process.exit(1);
 }
+
+// Global state
+let auth_token = null;
 
 // Create proofs directory if it doesn't exist
 if (!fs.existsSync(PROOFS_DIR)) {
     fs.mkdirSync(PROOFS_DIR);
 }
 
-// Axios Instance with dynamic headers
-const api = axios.create({
-    baseURL: BASE_URL,
-    headers: {
+/**
+ * Native Fetch-based request helper to replace Axios
+ */
+async function request(endpoint, options = {}) {
+    const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
+    
+    // Initialize headers
+    const headers = {
         'x-client-id': CLIENT_ID,
-        'x-client-hash': CLIENT_HASH
+        'x-client-hash': CLIENT_HASH,
+        ...options.headers
+    };
+
+    // Add Authorization if available
+    if (auth_token) {
+        headers['Authorization'] = auth_token;
+    } else if (fs.existsSync(TOKEN_FILE)) {
+        auth_token = fs.readFileSync(TOKEN_FILE, 'utf8');
+        headers['Authorization'] = auth_token;
     }
-});
+
+    // Determine method and body
+    const isFormData = options.body instanceof FormData;
+    const method = options.method || (options.data || options.body ? 'POST' : 'GET');
+    
+    let body = options.body;
+    if (options.data) {
+        body = JSON.stringify(options.data);
+        if (!headers['Content-Type']) {
+            headers['Content-Type'] = 'application/json';
+        }
+    }
+
+    const fetchOptions = {
+        method,
+        headers,
+        body
+    };
+
+    try {
+        let response = await fetch(url, fetchOptions);
+
+        // Handle 401 Unauthorized (Token expired)
+        if (response.status === 401 && !options._retry) {
+            console.log("Token expired or invalid. Re-authenticating...");
+            if (fs.existsSync(TOKEN_FILE)) fs.unlinkSync(TOKEN_FILE);
+            auth_token = null;
+            await login();
+            
+            // Retry the original request
+            return request(endpoint, { ...options, _retry: true });
+        }
+
+        const text = await response.text();
+        let responseData;
+        try {
+            responseData = text ? JSON.parse(text) : {};
+        } catch (e) {
+            responseData = { message: text };
+        }
+
+        if (!response.ok) {
+            const error = new Error(responseData.message || response.statusText);
+            error.response = { data: responseData, status: response.status };
+            throw error;
+        }
+
+        return { data: responseData };
+    } catch (error) {
+        if (error.response) throw error;
+        throw new Error(`Network error: ${error.message}`);
+    }
+}
 
 // Sleep helper
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -47,13 +124,16 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 async function login() {
     console.log("Attempting to log in...");
     try {
-        const response = await api.post('/auth/login', {
-            username: USERNAME,
-            password: PASSWORD
+        const response = await request('/auth/login', {
+            method: 'POST',
+            data: {
+                username: USERNAME,
+                password: PASSWORD
+            }
         });
         const token = response.data.data.auth.token;
         fs.writeFileSync(TOKEN_FILE, token);
-        api.defaults.headers['Authorization'] = token;
+        auth_token = token;
         console.log("Login successful. Token saved.");
         return token;
     } catch (error) {
@@ -63,35 +143,21 @@ async function login() {
 }
 
 async function ensureAuth() {
-    if (api.defaults.headers['Authorization']) return;
+    if (auth_token) return;
     if (fs.existsSync(TOKEN_FILE)) {
-        api.defaults.headers['Authorization'] = fs.readFileSync(TOKEN_FILE, 'utf8');
+        auth_token = fs.readFileSync(TOKEN_FILE, 'utf8');
     } else {
         await login();
     }
 }
 
-// Interceptor to handle 401s globally
-api.interceptors.response.use(response => response, async error => {
-    if (error.response && error.response.status === 401) {
-        console.log("Token expired or invalid. Re-authenticating...");
-        if (fs.existsSync(TOKEN_FILE)) fs.unlinkSync(TOKEN_FILE);
-        delete api.defaults.headers['Authorization'];
-        await login();
-        // Retry the original request
-        error.config.headers['Authorization'] = api.defaults.headers['Authorization'];
-        return axios(error.config);
-    }
-    return Promise.reject(error);
-});
-
 async function getPendingTasks() {
-    const response = await api.get('/social/tasks/pending?page=1');
+    const response = await request('/social/tasks/pending?page=1');
     return response.data.data.tasks || [];
 }
 
 async function getAvailableCategories() {
-    const response = await api.get('/social/tasks/pricing');
+    const response = await request('/social/tasks/pricing');
     const categories = response.data.data.task_pricing;
     
     // Rank logic: Must have tasks > 0. Sort by highest tasks count.
@@ -101,28 +167,33 @@ async function getAvailableCategories() {
 }
 
 async function generateTask(categoryId) {
-    const response = await api.get(`/social/tasks/${categoryId}/generate-task`);
+    const response = await request(`/social/tasks/${categoryId}/generate-task`);
     const tasks = response.data.data.tasks;
     if (!tasks || tasks.length === 0) throw new Error("No task returned during generation.");
     return tasks[0]._id;
 }
 
 async function viewTask(taskId) {
-    const response = await api.get(`/social/task/${taskId}`);
+    const response = await request(`/social/task/${taskId}`);
     return response.data.data.task;
 }
 
 async function submitProof(taskId, filePath) {
     console.log(`Submitting proof for task ${taskId}...`);
+    
+    // Read file as a Blob for native FormData
+    const buffer = fs.readFileSync(filePath);
+    const blob = new Blob([buffer], { type: 'image/png' });
+
     const form = new FormData();
     form.append('name', SOCIAL_USERNAME);
-    form.append('photos', fs.createReadStream(filePath));
+    form.append('photos', blob, `${taskId}.png`);
 
-    const response = await api.post(`/social/task/${taskId}/proof`, form, {
-        headers: {
-            ...form.getHeaders()
-        }
+    const response = await request(`/social/task/${taskId}/proof`, {
+        method: 'POST',
+        body: form
     });
+    
     console.log(`Proof submitted successfully for task ${taskId}!`);
     return response.data;
 }
@@ -209,4 +280,4 @@ async function runLoop() {
 }
 
 // Start the daemon
-runLoop();
+runLoop();

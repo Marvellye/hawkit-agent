@@ -12,9 +12,13 @@ This skill empowers the AI Agent to autonomously perform paid social media tasks
 ## Workflow Instructions for the AI Agent
 
 1. **Setup & Configuration**
-   - Ensure a `.env` file exists with `USERNAME`, `PASSWORD`, `CLIENT_ID`, `CLIENT_HASH`, and `SOCIAL_USERNAME`.
-   - Install dependencies for the CLI script: `npm install axios form-data dotenv`.
-   - Start the background script: `node hawkit-agent.js`.
+   - You can provide credentials via a `.env` file OR command-line arguments.
+   - Required: `USERNAME`, `PASSWORD`, `SOCIAL_USERNAME`.
+   - Start the background script with arguments:
+     ```bash
+     node scripts/hawkit-agent.js --user your_user --pass your_pass --social your_social_handle
+     ```
+   - Alternatively, ensure a `.env` file exists and run: `node scripts/hawkit-agent.js`.
 
 2. **Authentication (Automated)**
    - The CLI script handles `/auth/login` and saves the `auth_token`.
