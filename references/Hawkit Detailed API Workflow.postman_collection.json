@@ -1,0 +1,1227 @@
+{
+  "info": {
+    "_postman_id": "c6502dfc-ab31-4cfb-b926-c6f83b2b7499",
+    "name": "Hawkit Detailed API Workflow",
+    "description": "A fully chained and parameterized collection for the Hawkit/Efluence API including success examples. \n\n**Workflow:**\n1. Run **Login** (automatically sets `auth_token`).\n2. Run **Generate Task** (automatically sets `task_id`).\n3. Run **View Task** or **Submit Proof**.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "44188441",
+    "_collection_link": "https://go.postman.co/collection/44188441-c6502dfc-ab31-4cfb-b926-c6f83b2b7499?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Extract and set Auth Token\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql(\"success\");",
+                  "    pm.expect(jsonData.data.auth.token).to.not.be.undefined;",
+                  "    ",
+                  "    pm.environment.set(\"auth_token\", jsonData.data.auth.token);",
+                  "    console.log(\"Token saved successfully!\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Client-Id",
+                "value": "{{client_id}}",
+                "type": "text"
+              },
+              {
+                "key": "X-Client-Hash",
+                "value": "{{client_hash}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"{{username}}\",\r\n  \"password\": \"{{password}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "X-Client-Id",
+                    "value": "1a26257c5fb5e4c7edc048035704ca0a",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-Client-Hash",
+                    "value": "1a26257c5fb5e4c7edc048035704ca0a",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"username\": \"smarte\",\r\n  \"password\": \"smartearners\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "https://api.efluence.ng/auth/login",
+                  "protocol": "https",
+                  "host": [
+                    "api",
+                    "efluence",
+                    "ng"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"auth\": {\n            \"token\": \"$2a$12$0fbUjL9AxMrzo2txSX3vLug.nFPX.NFqtCznDRWZXN6BFOyu9EkLO\",\n            \"created_on\": \"2026-04-13T18:44:52.551Z\",\n            \"expires_in\": 31103999909\n        }\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. User Data",
+      "item": [
+        {
+          "name": "Get Profile (Me)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"User profile data is returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql(\"success\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{auth_token}}",
+                "type": "text"
+              },
+              {
+                "key": "x-client-id",
+                "value": "{{client_id}}",
+                "type": "text"
+              },
+              {
+                "key": "x-client-hash",
+                "value": "{{client_hash}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "me"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "$2a$12$0fbUjL9AxMrzo2txSX3vLug.nFPX.NFqtCznDRWZXN6BFOyu9EkLO",
+                    "type": "text"
+                  },
+                  {
+                    "key": "x-client-id",
+                    "value": "1a26257c5fb5e4c7edc048035704ca0a",
+                    "type": "text"
+                  },
+                  {
+                    "key": "x-client-hash",
+                    "value": "1a26257c5fb5e4c7edc048035704ca0a",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://api.efluence.ng/users/me",
+                  "protocol": "https",
+                  "host": [
+                    "api",
+                    "efluence",
+                    "ng"
+                  ],
+                  "path": [
+                    "users",
+                    "me"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"user\": {\n            \"wallet\": {\n                \"main\": 0,\n                \"locked\": 0,\n                \"shopping\": 0\n            },\n            \"_id\": \"69dd299abaa3bb6e1c276e61\",\n            \"name\": \"SmartE\",\n            \"email\": \"smartearnersverified@gmail.com\",\n            \"username\": \"smarte\",\n            \"user_type\": \"member\",\n            \"is_activated\": true,\n            \"is_member\": true,\n            \"is_verified\": false\n        },\n        \"minimum_withdrawal\": 100,\n        \"meta\": {\n            \"support_url\": \"https://hawkit.ng/support\",\n            \"total_earnings\": 0,\n            \"total_spent\": 0\n        }\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Social Tasks",
+      "item": [
+        {
+          "name": "0. Get All Tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{auth_token}}",
+                "type": "text"
+              },
+              {
+                "key": "x-client-id",
+                "value": "{{client_id}}",
+                "type": "text"
+              },
+              {
+                "key": "x-client-hash",
+                "value": "{{client_hash}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://api.efluence.ng/social/tasks/pricing",
+              "protocol": "https",
+              "host": [
+                "api",
+                "efluence",
+                "ng"
+              ],
+              "path": [
+                "social",
+                "tasks",
+                "pricing"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{auth_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "x-client-id",
+                    "value": "{{client_id}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "x-client-hash",
+                    "value": "{{client_hash}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://api.efluence.ng/social/tasks/pricing",
+                  "protocol": "https",
+                  "host": [
+                    "api",
+                    "efluence",
+                    "ng"
+                  ],
+                  "path": [
+                    "social",
+                    "tasks",
+                    "pricing"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": ":status",
+                  "value": 200
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 13 Apr 2026 20:35:39 GMT"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "server",
+                  "value": "cloudflare"
+                },
+                {
+                  "key": "set-cookie",
+                  "value": "__cf_bm=yBxC3UyA6nHJ92HaEQi8Us6J3HhyGKolwFWhhCiObyo-1776112537.9630988-1.0.1.1-10Bv6wagARzS1bOLh8kWymA7u28uEkinDRd2_cSsFB6BKBBTWAGPYq3oPEUrhlMWCRaJcGmFgL7EhWhWbrmDkDKKZvARbqPw3J2jn.gOpFgPnLfN_vqxVeprwC1fNVCZ; HttpOnly; Secure; Path=/; Domain=api.efluence.ng; Expires=Mon, 13 Apr 2026 21:05:39 GMT"
+                },
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                },
+                {
+                  "key": "access-control-allow-methods",
+                  "value": "GET, POST, PUT, DELETE, OPTIONS"
+                },
+                {
+                  "key": "access-control-allow-headers",
+                  "value": "Content-Type, Authorization, X-Client-Id, X-Client-Hash, TwoFactorAuth, X-Client-Version"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"1b68-Wxoxxrbn6VXvTGepokjvM7zuj+U\""
+                },
+                {
+                  "key": "x-do-app-origin",
+                  "value": "6c9c0fbb-cc7b-442b-8e81-068b4f5cf8f9"
+                },
+                {
+                  "key": "x-do-orig-status",
+                  "value": "200"
+                },
+                {
+                  "key": "cf-cache-status",
+                  "value": "MISS"
+                },
+                {
+                  "key": "content-encoding",
+                  "value": "br"
+                },
+                {
+                  "key": "cf-ray",
+                  "value": "9ebd42224935d06b-LHR"
+                },
+                {
+                  "key": "alt-svc",
+                  "value": "h3=\":443\"; ma=86400"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"task_pricing\": [\n            {\n                \"_id\": \"630f312f7c7abf3078452626\",\n                \"type\": \"follow\",\n                \"title\": \"Follow People & Pages\",\n                \"earning\": \"₦5 per Follow\",\n                \"platforms\": [\n                    \"instagram\",\n                    \"twitter\",\n                    \"tiktok\"\n                ],\n                \"description\": \"Follow people and pages on selected social media accounts and earn ₦5 per follow. The more people you follow, the more you earn.\",\n                \"task_type\": \"engagement\",\n                \"tasks\": 4360\n            },\n            {\n                \"_id\": \"630f312f7c7abf307845262d\",\n                \"type\": \"facebook-page-like\",\n                \"title\": \"Like and Follow Facebook Business Pages\",\n                \"earning\": \"₦5 per Page Like and Follow\",\n                \"platforms\": [\n                    \"facebook\"\n                ],\n                \"description\": \"Like and Follow Facebook Pages for Businesses and Organisations and earn ₦5 per Like/Follow. The more pages you like, the more you earn.\",\n                \"task_type\": \"engagement\",\n                \"tasks\": 359\n            },\n            {\n                \"_id\": \"630f312f7c7abf307845262a\",\n                \"type\": \"like\",\n                \"title\": \"Like Posts on Social Media\",\n                \"earning\": \"₦5 per Like\",\n                \"platforms\": [\n                    \"facebook\",\n                    \"instagram\",\n                    \"twitter\",\n                    \"tiktok\"\n                ],\n                \"description\": \"Like posts on selected social media accounts and earn ₦5 per Like. The more posts you like, the more you earn.\",\n                \"task_type\": \"engagement\",\n                \"tasks\": 327\n            },\n            {\n                \"_id\": \"630f312f7c7abf3078452629\",\n                \"type\": \"googlePlay\",\n                \"title\": \"Google Play App Download and Review\",\n                \"earning\": \"₦30 per Download and Review\",\n                \"platforms\": [\n                    \"googlePlay\"\n                ],\n                \"description\": \"Download and Review selected apps on Google Play Store and earn ₦30 per Review. The more you review, the more you earn.\",\n                \"task_type\": \"engagement\",\n                \"tasks\": 5\n            },\n            {\n                \"_id\": \"632f19a79c6d3e06d4f3f31c\",\n                \"type\": \"youtube\",\n                \"title\": \"View, Like and Comment on Youtube\",\n                \"earning\": \"₦30 per View, Like and Comment\",\n                \"platforms\": [\n                    \"youtube\"\n                ],\n                \"description\": \"View, Like and Comment on Youtube Videos and earn ₦30 per View, Like and Comment. The more videos you view and comment on, the more you earn\",\n                \"task_type\": \"engagement\",\n                \"tasks\": 4\n            },\n            {\n                \"_id\": \"630f312f7c7abf3078452625\",\n                \"type\": \"appStore\",\n                \"title\": \"Download and Review Apps on Apple Store\",\n                \"earning\": \"₦60 per Download and Review\",\n                \"platforms\": [\n                    \"appStore\"\n                ],\n                \"description\": \"Download and Review selected apps on the Apple Store and earn ₦60 per Review. The more you review, the more you earn\",\n                \"task_type\": \"engagement\",\n                \"tasks\": 2\n            },\n            {\n                \"_id\": \"630f312f7c7abf307845262e\",\n                \"type\": \"youtube\",\n                \"title\": \"Subscribe on Youtube Channels\",\n                \"earning\": \"₦30 per Subscribe\",\n                \"platforms\": [\n                    \"youtube\"\n                ],\n                \"description\": \"Subscribe on Youtube Channels and earn ₦30 per Subscription. The more channels you subscribe to, the more you earn\",\n                \"task_type\": \"engagement\",\n                \"tasks\": 1\n            },\n            {\n                \"_id\": \"63063879285d8272fd9043ca\",\n                \"type\": \"instagram\",\n                \"title\": \"Post Adverts on Instagram\",\n                \"earning\": \"₦100 per Advert Post\",\n                \"platforms\": [\n                    \"instagram\"\n                ],\n                \"description\": \"Post adverts of various businesses and top brands on your Instagram Page and earn N100 per advert post. The more you post, the more you earn. Note that your Instagram account must have atleast 1000 Active Followers to be eligible for this task.\",\n                \"task_type\": \"advertise\",\n                \"tasks\": 0\n            },\n            {\n                \"_id\": \"63063c8a285d8272fd9043cb\",\n                \"type\": \"twitter\",\n                \"title\": \"Post Adverts on Twitter\",\n                \"earning\": \"₦100 per Advert Post\",\n                \"platforms\": [\n                    \"twitter\"\n                ],\n                \"description\": \"Post adverts of various businesses and top brands on your Twitter Page and earn N100 per advert post. The more you post, the more you earn. Note that your Twitter account must have atleast 1000 Active Followers to be eligible for this task.\",\n                \"task_type\": \"advertise\",\n                \"tasks\": 0\n            },\n            {\n                \"_id\": \"63063cc8285d8272fd9043cc\",\n                \"type\": \"tiktok\",\n                \"title\": \"Post Adverts on Tiktok\",\n                \"earning\": \"₦100 per Advert Post\",\n                \"platforms\": [\n                    \"tiktok\"\n                ],\n                \"description\": \"Post adverts of various businesses and top brands on your Tiktok Page and earn N100 per advert post. The more you post, the more you earn. Note that your Tiktok account must have atleast 1000 Active Followers to be eligible for this task.\",\n                \"task_type\": \"advertise\",\n                \"tasks\": 0\n            },\n            {\n                \"_id\": \"61d2c10066122a0a0618fbb6\",\n                \"type\": \"facebook\",\n                \"title\": \"Post Adverts on Facebook\",\n                \"earning\": \"₦100 per Advert Post\",\n                \"platforms\": [\n                    \"facebook\"\n                ],\n                \"description\": \"Post adverts of various businesses and top brands on your Facebook Personal Page and earn N100 per advert post. The more you post, the more you earn. Note that your Facebook account must have atleast 1000 Active Friends or Followers to be eligible for this task.\",\n                \"task_type\": \"advertise\",\n                \"tasks\": 0\n            },\n            {\n                \"_id\": \"630f312f7c7abf307845262f\",\n                \"type\": \"audiomack\",\n                \"title\": \"Follow an account on Audiomack\",\n                \"earning\": \"₦10 per Follow\",\n                \"platforms\": [\n                    \"audiomack\"\n                ],\n                \"description\": \"Follow selected and given profiles on Audiomack and earn ₦10 per Follower. The more audiomack profiles you follow, the more you earn\",\n                \"task_type\": \"engagement\",\n                \"tasks\": 0\n            },\n            {\n                \"_id\": \"630f312f7c7abf3078452627\",\n                \"type\": \"comment\",\n                \"title\": \"Post Comments\",\n                \"earning\": \"₦20 per Comment\",\n                \"platforms\": [\n                    \"facebook\",\n                    \"instagram\",\n                    \"twitter\",\n                    \"tiktok\"\n                ],\n                \"description\": \"Comment on posts from selected social media accounts and earn ₦20 per Comment. The more posts you comment on, the more you earn\",\n                \"task_type\": \"engagement\",\n                \"tasks\": 0\n            },\n            {\n                \"_id\": \"630f332e7c7abf3078452632\",\n                \"type\": \"facebook-share\",\n                \"title\": \"Share Posts on Facebook\",\n                \"earning\": \"₦50 per Share\",\n                \"platforms\": [\n                    \"facebook\"\n                ],\n                \"description\": \"Share posts from selected social media accounts to your friends on Facebook and earn ₦50 per Share. The more posts you share, the more you earn\",\n                \"task_type\": \"engagement\",\n                \"tasks\": 0\n            },\n            {\n                \"_id\": \"630f312f7c7abf3078452628\",\n                \"type\": \"retweet\",\n                \"title\": \"Retweet on Twitter\",\n                \"earning\": \"₦50 per Retweet\",\n                \"platforms\": [\n                    \"twitter\"\n                ],\n                \"description\": \"Retweet posts on Twitter to your followers and earn ₦30 per Retweet. The more posts you retweet, the more you earn\",\n                \"task_type\": \"engagement\",\n                \"tasks\": 0\n            },\n            {\n                \"_id\": \"630f312f7c7abf3078452624\",\n                \"type\": \"whatsapp\",\n                \"title\": \"Post Advert on Whatsapp Status\",\n                \"earning\": \"₦50 per Status Post\",\n                \"platforms\": [\n                    \"whatsapp\"\n                ],\n                \"description\": \"Post adverts of various businesses and top brands on your Whatsapp Status and earn ₦50 per Post. The more you post, the more you earn\",\n                \"task_type\": \"advertise\",\n                \"tasks\": 0\n            },\n            {\n                \"_id\": \"630f312f7c7abf3078452631\",\n                \"type\": \"telegram\",\n                \"title\": \"Join a Telegram Group/Channel\",\n                \"earning\": \"₦50 per Telegram Group/Channel Joined\",\n                \"platforms\": [\n                    \"telegram\"\n                ],\n                \"description\": \"Join selected Telegram Groups and earn ₦50 per Telegram Group Joined. The more Telegram group you join, the more you earn.\",\n                \"task_type\": \"engagement\",\n                \"tasks\": 0\n            },\n            {\n                \"_id\": \"630f312f7c7abf3078452630\",\n                \"type\": \"whatsapp\",\n                \"title\": \"Join a Whatsapp Group\",\n                \"earning\": \"₦50 per Whatsapp Group Joined\",\n                \"platforms\": [\n                    \"whatsapp\"\n                ],\n                \"description\": \"Join selected Whatsapp Groups and earn ₦50 per Whatsapp Group Joined. The more whatsapp group you join, the more you earn.\",\n                \"task_type\": \"engagement\",\n                \"tasks\": 0\n            },\n            {\n                \"_id\": \"64a3f52fa0a03e40a3c16276\",\n                \"type\": \"googlePlay\",\n                \"title\": \"Download and Register Fully on the MKOBO App\",\n                \"earning\": \"₦50 per App Download, Installs and Review. You must complete your registration and become an active user on the MKOBO App before you can earn\",\n                \"platforms\": [\n                    \"googlePlay\"\n                ],\n                \"description\": \"Download and Install the MKOBO App on your phone and Earn N50 when you complete your registration on Mkobo\",\n                \"task_type\": \"engagement\",\n                \"tasks\": 0\n            }\n        ]\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "1. Get Category Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{auth_token}}",
+                "type": "text"
+              },
+              {
+                "key": "x-client-id",
+                "value": "{{client_id}}",
+                "type": "text"
+              },
+              {
+                "key": "x-client-hash",
+                "value": "{{client_hash}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/social/category/{{category_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "social",
+                "category",
+                "{{category_id}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{auth_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "x-client-id",
+                    "value": "{{client_id}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "x-client-hash",
+                    "value": "{{client_hash}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/social/category/{{category_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "social",
+                    "category",
+                    "{{category_id}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": ":status",
+                  "value": 200
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 13 Apr 2026 20:38:30 GMT"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                },
+                {
+                  "key": "access-control-allow-methods",
+                  "value": "GET, POST, PUT, DELETE, OPTIONS"
+                },
+                {
+                  "key": "access-control-allow-headers",
+                  "value": "Content-Type, Authorization, X-Client-Id, X-Client-Hash, TwoFactorAuth, X-Client-Version"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"572-w3YfLclYTOBy8qKWRfdef/1nNWA\""
+                },
+                {
+                  "key": "set-cookie",
+                  "value": "__cf_bm=Ou7no05C5NXrn64BBjQRYrvPyDtihGcE3If2ac3hdjc-1776112709.4531953-1.0.1.1-9_hoKx2Opij93yQb6kWUm62Ht9nCgvSeqhFooWOguprckp6fjDkPuwrtwxXVYFE_N9wU.TP85Qjk3nd8kI2GloI5qHpuhTvdccTvCQFs_NlPsLAo_2yi24uK6WQBb8gP; HttpOnly; Secure; Path=/; Domain=api.efluence.ng; Expires=Mon, 13 Apr 2026 21:08:30 GMT"
+                },
+                {
+                  "key": "x-do-app-origin",
+                  "value": "6c9c0fbb-cc7b-442b-8e81-068b4f5cf8f9"
+                },
+                {
+                  "key": "x-do-orig-status",
+                  "value": "200"
+                },
+                {
+                  "key": "server",
+                  "value": "cloudflare"
+                },
+                {
+                  "key": "cf-cache-status",
+                  "value": "MISS"
+                },
+                {
+                  "key": "content-encoding",
+                  "value": "br"
+                },
+                {
+                  "key": "cf-ray",
+                  "value": "9ebd46521c0cd06b-LHR"
+                },
+                {
+                  "key": "alt-svc",
+                  "value": "h3=\":443\"; ma=86400"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"category\": {\n            \"_id\": \"630f312f7c7abf3078452626\",\n            \"type\": \"follow\",\n            \"title\": \"Follow People & Pages\",\n            \"earning\": \"₦5 per Follow\",\n            \"platforms\": [\n                \"instagram\",\n                \"twitter\",\n                \"tiktok\"\n            ],\n            \"description\": \"Follow people and pages on selected social media accounts and earn ₦5 per follow. The more people you follow, the more you earn.\",\n            \"user_social\": null,\n            \"advert_text\": \"Hello, I would like to share with you an amazing platform called Hawkit. \\n\\nWith Hawkit, you can earn daily income by turning your social media account into a money making machine! \\n\\nYou can advertise and sell anything on Hawkit within a short period of time. You can also get many people with atleast 1,000 active followers each to repost your advert to their own audience\\n\\nHawkit also has a unique feature that allows you to earn constant daily income by posting adverts of various businesses and performing various social tasks such as Following, Liking, Commenting, Sharing etc. on your social media account.\\n\\nWith Hawkit, you can boost your social media page by getting people to follow your social media account, like and comment on your social media posts, subscribe on Youtube Channel etc.\\n\\nSounds interesting? Visit https://www.hawkit.ng to get started today.\",\n            \"advert_media\": \"https://static.efluence.ng/advert_sm.jpg\"\n        },\n        \"tasks_count\": {\n            \"pending\": 0,\n            \"failed\": 0,\n            \"cancelled\": 1,\n            \"completed\": 0,\n            \"uploaded\": 1\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "2. Generate Task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Extract Task ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql(\"success\");",
+                  "    ",
+                  "    if (jsonData.data && jsonData.data.tasks && jsonData.data.tasks.length > 0) {",
+                  "        var extractedTaskId = jsonData.data.tasks[0]._id;",
+                  "        pm.environment.set(\"task_id\", extractedTaskId);",
+                  "        console.log(\"New Task ID generated and saved: \" + extractedTaskId);",
+                  "    } else {",
+                  "        console.warn(\"No tasks were returned in the generation payload.\");",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{auth_token}}",
+                "type": "text"
+              },
+              {
+                "key": "x-client-id",
+                "value": "{{client_id}}",
+                "type": "text"
+              },
+              {
+                "key": "x-client-hash",
+                "value": "{{client_hash}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/social/tasks/{{category_id}}/generate-task",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "social",
+                "tasks",
+                "{{category_id}}",
+                "generate-task"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Generate Task Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "$2a$12$0fbUjL9AxMrzo2txSX3vLug.nFPX.NFqtCznDRWZXN6BFOyu9EkLO",
+                    "type": "text"
+                  },
+                  {
+                    "key": "x-client-id",
+                    "value": "1a26257c5fb5e4c7edc048035704ca0a",
+                    "type": "text"
+                  },
+                  {
+                    "key": "x-client-hash",
+                    "value": "1a26257c5fb5e4c7edc048035704ca0a",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://api.efluence.ng/social/tasks/630f312f7c7abf3078452626/generate-task",
+                  "protocol": "https",
+                  "host": [
+                    "api",
+                    "efluence",
+                    "ng"
+                  ],
+                  "path": [
+                    "social",
+                    "tasks",
+                    "630f312f7c7abf3078452626",
+                    "generate-task"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"tasks\": [\n            {\n                \"pricing_title\": {\n                    \"buyer\": \"₦8 per Follow\",\n                    \"seller\": \"₦5 per Follow\"\n                },\n                \"pricing\": {\n                    \"buyer\": 8,\n                    \"seller\": 5,\n                    \"referrer\": 1\n                },\n                \"_id\": \"69dd4075eaea0131f3668ffc\",\n                \"userId\": \"69dd299abaa3bb6e1c276e61\",\n                \"social_task_order\": {\n                    \"_id\": \"697622785fca27b76f6a899c\",\n                    \"platform\": \"instagram\"\n                },\n                \"social_task_category\": {\n                    \"title\": {\n                        \"buyer\": \"Get Real People to Follow Your Page on Social Media\",\n                        \"seller\": \"Follow People & Pages\"\n                    },\n                    \"pricing_title\": {\n                        \"buyer\": \"₦8 per Follow\",\n                        \"seller\": \"₦5 per Follow\"\n                    },\n                    \"pricing\": {\n                        \"seller\": 5\n                    },\n                    \"_id\": \"630f312f7c7abf3078452626\",\n                    \"task_steps\": \"follow-task-steps.html\",\n                    \"is_upload\": false,\n                    \"text\": \"Followers\"\n                },\n                \"link\": \"https://www.instagram.com/de_nony2?igsh=MWYxcHZhNjk2amM1eg==\",\n                \"status\": \"PENDING\",\n                \"expires_on\": \"2026-04-13T20:13:57.540Z\",\n                \"created_on\": \"2026-04-13T19:13:57.541Z\",\n                \"__v\": 0\n            }\n        ]\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "3. View Specific Task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{auth_token}}",
+                "type": "text"
+              },
+              {
+                "key": "x-client-id",
+                "value": "{{client_id}}",
+                "type": "text"
+              },
+              {
+                "key": "x-client-hash",
+                "value": "{{client_hash}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/social/task/{{task_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "social",
+                "task",
+                "{{task_id}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "View Task Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "$2a$12$0fbUjL9AxMrzo2txSX3vLug.nFPX.NFqtCznDRWZXN6BFOyu9EkLO",
+                    "type": "text"
+                  },
+                  {
+                    "key": "x-client-id",
+                    "value": "1a26257c5fb5e4c7edc048035704ca0a",
+                    "type": "text"
+                  },
+                  {
+                    "key": "x-client-hash",
+                    "value": "1a26257c5fb5e4c7edc048035704ca0a",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://api.efluence.ng/social/task/69dd4075eaea0131f3668ffc",
+                  "protocol": "https",
+                  "host": [
+                    "api",
+                    "efluence",
+                    "ng"
+                  ],
+                  "path": [
+                    "social",
+                    "task",
+                    "69dd4075eaea0131f3668ffc"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"task\": {\n            \"proof\": {},\n            \"pricing_title\": {\n                \"buyer\": \"₦8 per Follow\",\n                \"seller\": \"₦5 per Follow\"\n            },\n            \"pricing\": {\n                \"buyer\": 8,\n                \"seller\": 5,\n                \"referrer\": 1\n            },\n            \"_id\": \"69dd4075eaea0131f3668ffc\",\n            \"userId\": \"69dd299abaa3bb6e1c276e61\",\n            \"social_task_order\": {\n                \"_id\": \"697622785fca27b76f6a899c\",\n                \"platform\": \"instagram\"\n            },\n            \"social_task_category\": {\n                \"title\": {\n                    \"buyer\": \"Get Real People to Follow Your Page on Social Media\",\n                    \"seller\": \"Follow People & Pages\"\n                },\n                \"pricing_title\": {\n                    \"buyer\": \"₦8 per Follow\",\n                    \"seller\": \"₦5 per Follow\"\n                },\n                \"proof_of_work\": {\n                    \"title\": \"Social Media Username\",\n                    \"description\": \"Please enter the username of the social media account you used to perform the task e.g Instagram username, Twitter username, Tiktok username etc.\"\n                },\n                \"pricing\": {\n                    \"seller\": 5\n                },\n                \"_id\": \"630f312f7c7abf3078452626\",\n                \"task_steps\": \"follow-task-steps.html\",\n                \"is_upload\": false,\n                \"type\": \"follow\",\n                \"text\": \"Followers\"\n            },\n            \"link\": \"https://www.instagram.com/de_nony2?igsh=MWYxcHZhNjk2amM1eg==\",\n            \"status\": \"PENDING\",\n            \"expires_on\": \"2026-04-13T20:13:57.540Z\",\n            \"created_on\": \"2026-04-13T19:13:57.541Z\",\n            \"__v\": 0,\n            \"task_steps\": \"<p class=\\\"f-10 mb-2\\\">\\n  The task you are given is to follow an account on social media pages e.g\\n  Instagram, Twitter or Tiktok.\\n</p>\\n<p class=\\\"f-10 fw-600 mb-2\\\">\\n  Please follow the step-by-step instructions below to do your task:\\n</p>\\n<div class=\\\"px-2\\\">\\n  <p class=\\\"f-10 mb-2\\\">\\n    <b>Step 1:</b> Open the Task Link above on your social media app e.g\\n    Instagram, Twitter or Tiktok.\\n  </p>\\n  <p class=\\\"f-10 mb-2\\\">\\n    <b>Step 2:</b> The link will direct you to a social media profile which you\\n    are meant to follow.\\n  </p>\\n  <p class=\\\"f-10 mb-2\\\">\\n    <b>Step 3:</b> Click on the Follow button to follow the given social media\\n    profile. You MUST NOT Unfollow the account after you have followed the\\n    account.\\n  </p>\\n  <p class=\\\"f-10 mb-2\\\">\\n    <b>Step 4:</b> Create a screenshot of the page that shows you are following\\n    the account and upload the screenshot under the Proof of Work Form below.\\n    You are also required to enter your social media account username (e.g Your\\n    Instagram, Twitter or Tiktok username) which you used to perform the task\\n  </p>\\n</div>\\n<div class=\\\"alert alert-info px-3 py-1 f-10\\\">\\n  You must NOT UNFOLLOW the account after you have followed the account. Your\\n  Hawkit account will be suspended once you UNFOLLOW the account. You will not\\n  be able to perform tasks anymore if you UNFOLLOW the account.\\n</div>\\n\",\n            \"tasks_in_review\": \"<div class=\\\"alert alert-primary px-3 py-1\\\">\\n  <h7>TASK IS BEING VERIFIED!</h7>\\n  <p class=\\\"f-10 mb-2\\\">\\n    Thank you for performing this task. The owner of the task that assigned the\\n    task to you is currently verifying what you have done. Your money is\\n    currently pending until the task you have performed is confirmed and\\n    approved by the owner.\\n  </p>\\n  <p class=\\\"f-10 mb-2\\\">\\n    The owner of the task has to verify what you have done within the next 5\\n    days. However, your task may be verified within 24 hours if you performed\\n    the task well and all task instructions are adhered to.\\n  </p>\\n  <p class=\\\"f-10\\\">\\n    This approval process is very necessary in order to ensure that the task is\\n    properly carried out. If you didn't perform the task or you failed to follow\\n    all task instructions, you can still do the task and resubmit, otherwise,\\n    you will be PENALISED if you failed the task.\\n  </p>\\n</div>\\n\"\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "4. Submit Proof",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{auth_token}}",
+                "type": "text"
+              },
+              {
+                "key": "x-client-id",
+                "value": "{{client_id}}",
+                "type": "text"
+              },
+              {
+                "key": "x-client-hash",
+                "value": "{{client_hash}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photos",
+                  "description": "Upload the screenshot proof here",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "key": "name",
+                  "value": "marvelly_ng",
+                  "description": "Social media username used to perform the task",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/social/task/{{task_id}}/proof",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "social",
+                "task",
+                "{{task_id}}",
+                "proof"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Submit Proof Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "$2a$12$0fbUjL9AxMrzo2txSX3vLug.nFPX.NFqtCznDRWZXN6BFOyu9EkLO",
+                    "type": "text"
+                  },
+                  {
+                    "key": "x-client-id",
+                    "value": "1a26257c5fb5e4c7edc048035704ca0a",
+                    "type": "text"
+                  },
+                  {
+                    "key": "x-client-hash",
+                    "value": "1a26257c5fb5e4c7edc048035704ca0a",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "photos",
+                      "type": "file",
+                      "src": [
+                        "/C:/Users/user/Pictures/Screenshots/Screenshot 2026-04-13 202028.png"
+                      ]
+                    },
+                    {
+                      "key": "name",
+                      "value": "marvelly_ng",
+                      "type": "text"
+                    }
+                  ],
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "https://api.efluence.ng/social/task/69dd4075eaea0131f3668ffc/proof",
+                  "protocol": "https",
+                  "host": [
+                    "api",
+                    "efluence",
+                    "ng"
+                  ],
+                  "path": [
+                    "social",
+                    "task",
+                    "69dd4075eaea0131f3668ffc",
+                    "proof"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"task\": {\n            \"proof\": {\n                \"name\": \"marvelly_ng\",\n                \"photo\": \"https://mrandmrsreal.nyc3.cdn.digitaloceanspaces.com/images/products/10337999ff65fd77f0dd4abb040ccf85ce221b7c6145464790bcc23b1d5f8c81.png\"\n            },\n            \"pricing_title\": {\n                \"buyer\": \"₦8 per Follow\",\n                \"seller\": \"₦5 per Follow\"\n            },\n            \"pricing\": {\n                \"buyer\": 8,\n                \"seller\": 5,\n                \"referrer\": 1\n            },\n            \"_id\": \"69dd4075eaea0131f3668ffc\",\n            \"userId\": \"69dd299abaa3bb6e1c276e61\",\n            \"social_task_order\": {\n                \"_id\": \"697622785fca27b76f6a899c\",\n                \"platform\": \"instagram\"\n            },\n            \"social_task_category\": {\n                \"title\": {\n                    \"buyer\": \"Get Real People to Follow Your Page on Social Media\",\n                    \"seller\": \"Follow People & Pages\"\n                },\n                \"pricing_title\": {\n                    \"buyer\": \"₦8 per Follow\",\n                    \"seller\": \"₦5 per Follow\"\n                },\n                \"pricing\": {\n                    \"seller\": 5\n                },\n                \"_id\": \"630f312f7c7abf3078452626\",\n                \"task_steps\": \"follow-task-steps.html\",\n                \"is_upload\": false,\n                \"type\": \"follow\",\n                \"text\": \"Followers\",\n                \"activity_text\": \"following a page or account on\"\n            },\n            \"link\": \"https://www.instagram.com/de_nony2?igsh=MWYxcHZhNjk2amM1eg==\",\n            \"status\": \"UPLOADED\",\n            \"expires_on\": \"2026-04-13T20:13:57.540Z\",\n            \"created_on\": \"2026-04-13T19:13:57.541Z\",\n            \"__v\": 0,\n            \"date_uploaded\": \"2026-04-13T19:42:05.557Z\",\n            \"verification_expires_on\": \"2026-04-18T19:42:05.557Z\"\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Uploaded Tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{auth_token}}",
+                "type": "text"
+              },
+              {
+                "key": "x-client-id",
+                "value": "{{client_id}}",
+                "type": "text"
+              },
+              {
+                "key": "x-client-hash",
+                "value": "{{client_hash}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://api.efluence.ng/social/tasks/uploaded?page=1",
+              "protocol": "https",
+              "host": [
+                "api",
+                "efluence",
+                "ng"
+              ],
+              "path": [
+                "social",
+                "tasks",
+                "uploaded"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{auth_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "x-client-id",
+                    "value": "{{client_id}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "x-client-hash",
+                    "value": "{{client_hash}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://api.efluence.ng/social/tasks/uploaded?page=1",
+                  "protocol": "https",
+                  "host": [
+                    "api",
+                    "efluence",
+                    "ng"
+                  ],
+                  "path": [
+                    "social",
+                    "tasks",
+                    "uploaded"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": ":status",
+                  "value": 200
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 13 Apr 2026 20:09:48 GMT"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "server",
+                  "value": "cloudflare"
+                },
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                },
+                {
+                  "key": "access-control-allow-methods",
+                  "value": "GET, POST, PUT, DELETE, OPTIONS"
+                },
+                {
+                  "key": "access-control-allow-headers",
+                  "value": "Content-Type, Authorization, X-Client-Id, X-Client-Hash, TwoFactorAuth, X-Client-Version"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"5b8-LkI7q+odJ0OJ1rJc9+h1E+RzQH0\""
+                },
+                {
+                  "key": "x-do-app-origin",
+                  "value": "6c9c0fbb-cc7b-442b-8e81-068b4f5cf8f9"
+                },
+                {
+                  "key": "x-do-orig-status",
+                  "value": "200"
+                },
+                {
+                  "key": "cf-cache-status",
+                  "value": "MISS"
+                },
+                {
+                  "key": "content-encoding",
+                  "value": "br"
+                },
+                {
+                  "key": "cf-ray",
+                  "value": "9ebd1c415c7f5259-LHR"
+                },
+                {
+                  "key": "alt-svc",
+                  "value": "h3=\":443\"; ma=86400"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"pages\": {\n            \"total\": 1,\n            \"current\": 1,\n            \"next\": null,\n            \"prev\": null\n        },\n        \"total\": 1,\n        \"tasks\": [\n            {\n                \"proof\": {\n                    \"name\": \"marvelly_ng\",\n                    \"photo\": \"https://mrandmrsreal.nyc3.cdn.digitaloceanspaces.com/images/products/10337999ff65fd77f0dd4abb040ccf85ce221b7c6145464790bcc23b1d5f8c81.png\"\n                },\n                \"pricing_title\": {\n                    \"buyer\": \"₦8 per Follow\",\n                    \"seller\": \"₦5 per Follow\"\n                },\n                \"pricing\": {\n                    \"buyer\": 8,\n                    \"seller\": 5,\n                    \"referrer\": 1\n                },\n                \"_id\": \"69dd4075eaea0131f3668ffc\",\n                \"userId\": \"69dd299abaa3bb6e1c276e61\",\n                \"social_task_order\": {\n                    \"_id\": \"697622785fca27b76f6a899c\",\n                    \"platform\": \"instagram\"\n                },\n                \"social_task_category\": {\n                    \"title\": {\n                        \"buyer\": \"Get Real People to Follow Your Page on Social Media\",\n                        \"seller\": \"Follow People & Pages\"\n                    },\n                    \"pricing_title\": {\n                        \"buyer\": \"₦8 per Follow\",\n                        \"seller\": \"₦5 per Follow\"\n                    },\n                    \"proof_of_work\": {\n                        \"title\": \"Social Media Username\",\n                        \"description\": \"Please enter the username of the social media account you used to perform the task e.g Instagram username, Twitter username, Tiktok username etc.\"\n                    },\n                    \"pricing\": {\n                        \"seller\": 5\n                    },\n                    \"_id\": \"630f312f7c7abf3078452626\",\n                    \"task_steps\": \"follow-task-steps.html\",\n                    \"is_upload\": false,\n                    \"type\": \"follow\",\n                    \"text\": \"Followers\"\n                },\n                \"link\": \"https://www.instagram.com/de_nony2?igsh=MWYxcHZhNjk2amM1eg==\",\n                \"status\": \"UPLOADED\",\n                \"expires_on\": \"2026-04-13T20:13:57.540Z\",\n                \"created_on\": \"2026-04-13T19:13:57.541Z\",\n                \"__v\": 0,\n                \"date_uploaded\": \"2026-04-13T19:42:05.557Z\",\n                \"verification_expires_on\": \"2026-04-18T19:42:05.557Z\"\n            }\n        ],\n        \"tasks_count\": {\n            \"pending\": 0,\n            \"failed\": 0,\n            \"cancelled\": 1,\n            \"completed\": 0,\n            \"uploaded\": 1\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Pending Task",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{auth_token}}",
+                "type": "text"
+              },
+              {
+                "key": "x-client-id",
+                "value": "{{client_id}}",
+                "type": "text"
+              },
+              {
+                "key": "x-client-hash",
+                "value": "{{client_hash}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://api.efluence.ng/social/tasks/pending?page=1",
+              "protocol": "https",
+              "host": [
+                "api",
+                "efluence",
+                "ng"
+              ],
+              "path": [
+                "social",
+                "tasks",
+                "pending"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{auth_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "x-client-id",
+                    "value": "{{client_id}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "x-client-hash",
+                    "value": "{{client_hash}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "https://api.efluence.ng/social/tasks/pending?page=1",
+                  "protocol": "https",
+                  "host": [
+                    "api",
+                    "efluence",
+                    "ng"
+                  ],
+                  "path": [
+                    "social",
+                    "tasks",
+                    "pending"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": ":status",
+                  "value": 200
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 13 Apr 2026 20:42:28 GMT"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                },
+                {
+                  "key": "access-control-allow-methods",
+                  "value": "GET, POST, PUT, DELETE, OPTIONS"
+                },
+                {
+                  "key": "access-control-allow-headers",
+                  "value": "Content-Type, Authorization, X-Client-Id, X-Client-Hash, TwoFactorAuth, X-Client-Version"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"ba-G/+iOOyFny9FNefrm6qZdBdFAyc\""
+                },
+                {
+                  "key": "set-cookie",
+                  "value": "__cf_bm=7MDCsK0E3MjpGNXTHPnQlLaF9QqjPCyx7BiJuhO2beM-1776112946.6907012-1.0.1.1-c8H2c053PpJClU5xHsHSS.kBmNaTzC9o70gFEQ_SUxnLUlXDLnivx0310OFzJM3asJ53biLoX_tP3NssSUMkmQFbOmLdnwRWfzey2aL2r6Ot8ILjViEVIaqWyHfDPpmi; HttpOnly; Secure; Path=/; Domain=api.efluence.ng; Expires=Mon, 13 Apr 2026 21:12:28 GMT"
+                },
+                {
+                  "key": "x-do-app-origin",
+                  "value": "6c9c0fbb-cc7b-442b-8e81-068b4f5cf8f9"
+                },
+                {
+                  "key": "x-do-orig-status",
+                  "value": "200"
+                },
+                {
+                  "key": "server",
+                  "value": "cloudflare"
+                },
+                {
+                  "key": "cf-cache-status",
+                  "value": "MISS"
+                },
+                {
+                  "key": "content-encoding",
+                  "value": "br"
+                },
+                {
+                  "key": "cf-ray",
+                  "value": "9ebd4c1ccb97d06b-LHR"
+                },
+                {
+                  "key": "alt-svc",
+                  "value": "h3=\":443\"; ma=86400"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"pages\": {\n            \"total\": 0,\n            \"current\": 1,\n            \"next\": null,\n            \"prev\": null\n        },\n        \"total\": 0,\n        \"tasks\": [],\n        \"tasks_count\": {\n            \"pending\": 0,\n            \"failed\": 0,\n            \"cancelled\": 1,\n            \"completed\": 0,\n            \"uploaded\": 1\n        }\n    }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
