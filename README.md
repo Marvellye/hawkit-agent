@@ -20,8 +20,11 @@ hawkit/
 │   ├── proofs/          # Temporary storage for task screenshots
 │   └── tasks/           # Platform-specific automation scripts
 │       ├── instagram-follow.js
-│       └── instagram-login.js
+│       ├── instagram-login.js
+│       ├── tiktok-like.js
+│       └── tiktok-login.js
 ├── ig-profile/          # Persistent Instagram session data
+├── tiktok-profile/      # Persistent TikTok session data
 └── package.json
 ```
 
@@ -34,10 +37,9 @@ hawkit/
    ```
 
 2. **Login to Social Media**:
-   Run the login script for the platform you want to use (e.g., Instagram) and log in manually in the browser window that opens. This only needs to be done once as the session is saved.
-   ```bash
-   node scripts/tasks/instagram-login.js
-   ```
+   Run the login script for the platform you want to use and log in manually in the browser window that opens.
+   - **Instagram**: `node scripts/tasks/instagram-login.js`
+   - **TikTok**: `node scripts/tasks/tiktok-login.js`
 
 3. **Configure Credentials**:
    You can provide credentials via command-line flags or a `.env` file.
