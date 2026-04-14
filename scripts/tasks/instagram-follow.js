@@ -79,7 +79,7 @@ function sleep(ms) {
   }
 
   // Screenshot
-  const proofsDir = path.join(__dirname, 'proofs');
+  const proofsDir = path.join(__dirname, '..', 'proofs');
   if (!fs.existsSync(proofsDir)) {
     fs.mkdirSync(proofsDir, { recursive: true });
   }
