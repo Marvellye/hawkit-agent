@@ -35,7 +35,7 @@ function sleep(ms) {
 
 (async () => {
   const context = await chromium.launchPersistentContext('./ig-profile', {
-    headless: false,
+    headless: true,
     viewport: { width: 1280, height: 800 }
   });
 

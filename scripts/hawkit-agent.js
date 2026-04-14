@@ -5,7 +5,7 @@ const HawkitClient = require('./api-client');
 
 // Configuration
 const PROOFS_DIR = path.join(__dirname, 'proofs');
-const LOOP_INTERVAL_MS = 10000;
+const LOOP_INTERVAL_MS = 5000;
 
 // Ensure proofs directory exists
 if (!fs.existsSync(PROOFS_DIR)) {

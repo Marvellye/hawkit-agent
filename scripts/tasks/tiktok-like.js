@@ -32,7 +32,7 @@ function sleep(ms) {
 (async () => {
   const profileDir = path.join(process.cwd(), 'tiktok-profile');
   const context = await chromium.launchPersistentContext(profileDir, {
-    headless: false,
+    headless: true,
     viewport: { width: 1280, height: 800 }
   });
 
