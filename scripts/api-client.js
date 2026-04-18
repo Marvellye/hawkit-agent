@@ -142,6 +142,15 @@ class HawkitClient {
         console.log(`Proof submitted successfully for task ${taskId}!`);
         return response.data;
     }
+
+    async cancelTask(taskId) {
+        console.log(`Canceling task ${taskId}...`);
+        const response = await this.request(`/social/task/${taskId}/cancel`, {
+            method: 'POST'
+        });
+        console.log(`Task ${taskId} canceled successfully!`);
+        return response.data;
+    }
 }
 
 module.exports = HawkitClient;

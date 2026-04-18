@@ -51,6 +51,9 @@ const TASK_SCRIPTS = {
     },
     'tiktok': {
         'like': 'tasks/tiktok-like.js',
+    },
+    'twitter': {
+        'follow': 'tasks/twitter-follow.js',
     }
 };
 
@@ -90,13 +93,19 @@ async function runTaskScript(platform, action, link, taskId) {
 async function processTask(taskId) {
     try {
         const taskDetails = await client.viewTask(taskId);
-        const platform = taskDetails.social_task_order?.platform;
+        const platform = (taskDetails.social_task_order?.platform || 'unknown').toLowerCase();
         const action = taskDetails.social_task_category?.type;
         const link = taskDetails.link;
 
         console.log(`\n--- PROCESSING TASK: ${taskId} ---`);
         console.log(`Platform: ${platform} | Action: ${action}`);
         console.log(`Link: ${link}`);
+
+        if (platform !== 'instagram') {
+            console.log(`Platform "${platform}" is not supported. Canceling task...`);
+            await client.cancelTask(taskId);
+            return;
+        }
 
         // Run the appropriate script instead of waiting for AI
         const proofPath = await runTaskScript(platform, action, link, taskId);

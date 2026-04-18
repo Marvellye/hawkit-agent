@@ -22,9 +22,12 @@ hawkit/
 │       ├── instagram-follow.js
 │       ├── instagram-login.js
 │       ├── tiktok-like.js
-│       └── tiktok-login.js
+│       ├── tiktok-login.js
+│       ├── twitter-follow.js
+│       └── twitter-login.js
 ├── ig-profile/          # Persistent Instagram session data
 ├── tiktok-profile/      # Persistent TikTok session data
+├── twitter-profile/     # Persistent Twitter session data
 └── package.json
 ```
 
@@ -40,6 +43,7 @@ hawkit/
    Run the login script for the platform you want to use and log in manually in the browser window that opens.
    - **Instagram**: `node scripts/tasks/instagram-login.js`
    - **TikTok**: `node scripts/tasks/tiktok-login.js`
+   - **Twitter/X**: `node scripts/tasks/twitter-login.js`
 
 3. **Configure Credentials**:
    You can provide credentials via command-line flags or a `.env` file.

@@ -7,6 +7,7 @@ const { chromium } = require('playwright');
   });
 
   const page = await context.newPage();
+  page.setDefaultTimeout(0);
 
   console.log("Opening Instagram...");
   await page.goto('https://www.instagram.com/', {
