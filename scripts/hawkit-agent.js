@@ -123,6 +123,9 @@ async function processTask(taskId) {
     }
 }
 
+let useLikeCategory = false;
+const LIKE_CATEGORY_ID = '630f312f7c7abf307845262a';
+
 async function runLoop() {
     console.log("Starting Hawkit Automated Workflow...");
     
@@ -145,10 +148,24 @@ async function runLoop() {
                 if (categories.length === 0) {
                     console.log("No categories have available tasks right now.");
                 } else {
-                    const bestCategory = categories[0];
-                    console.log(`Selecting Category: ${bestCategory.title} (${bestCategory.tasks} available)`);
+                    let selectedCategory;
                     
-                    const newTaskId = await client.generateTask(bestCategory._id);
+                    if (useLikeCategory) {
+                        selectedCategory = categories.find(c => c._id === LIKE_CATEGORY_ID);
+                        if (!selectedCategory) {
+                            console.log("Instagram Like category (630f312f7c7abf307845262a) not available. Using top category.");
+                            selectedCategory = categories[0];
+                        }
+                    } else {
+                        selectedCategory = categories[0];
+                    }
+
+                    // Toggle for next time a NEW task is generated
+                    useLikeCategory = !useLikeCategory;
+
+                    console.log(`Selecting Category: ${selectedCategory.title} (${selectedCategory.tasks} available)`);
+                    
+                    const newTaskId = await client.generateTask(selectedCategory._id);
                     console.log(`Successfully generated new task: ${newTaskId}`);
                     
                     await processTask(newTaskId);
