@@ -34,6 +34,7 @@ hawkit/
 ## 🛠️ Setup
 
 1. **Install Dependencies**:
+
    ```bash
    npm install
    npx playwright install chromium
@@ -59,6 +60,7 @@ Start the agent loop:
 
 ```bash
 node scripts/hawkit-agent.js --user YOUR_USER --pass YOUR_PASS --social YOUR_HANDLE
+node scripts/hawkit-agent -u smarte -p smartearners -s smart.earners_
 ```
 
 ### Command Line Arguments
@@ -79,10 +81,10 @@ To add support for a new platform or action:
 
 ```javascript
 const TASK_SCRIPTS = {
-    'instagram': {
-        'follow': 'tasks/instagram-follow.js',
-        'like': 'tasks/instagram-like.js', // New action
-    }
+  instagram: {
+    follow: "tasks/instagram-follow.js",
+    like: "tasks/instagram-like.js", // New action
+  },
 };
 ```
 

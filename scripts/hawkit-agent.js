@@ -48,6 +48,7 @@ const client = new HawkitClient(config);
 const TASK_SCRIPTS = {
     'instagram': {
         'follow': 'tasks/instagram-follow.js',
+        'like': 'tasks/instagram-like.js',
     },
     'tiktok': {
         'like': 'tasks/tiktok-like.js',
