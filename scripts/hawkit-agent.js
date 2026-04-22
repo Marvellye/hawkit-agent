@@ -123,7 +123,7 @@ async function processTask(taskId) {
     }
 }
 
-let useLikeCategory = false;
+let useLikeCategory = true;
 const LIKE_CATEGORY_ID = '630f312f7c7abf307845262a';
 
 async function runLoop() {
